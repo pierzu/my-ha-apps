@@ -1,5 +1,5 @@
 name: "Quarkus Backend"
-version: "0.0.1"
+version: "0.0.2"
 slug: "quarkus-backend"
 description: "Quarkus backend do testów lokalnych i uruchomienia w Home Assistant"
 arch:

@@ -4,7 +4,7 @@ Ta appka uruchamia kontener Quarkus w Home Assistant.
 
 ## Wymagania
 
-- obraz `ghcr.io/YOUR_GITHUB_LOGIN/my-quarkus-backend:0.0.6` musi istnieć
+- obraz `ghcr.io/YOUR_GITHUB_LOGIN/my-quarkus-backend:0.0.7` musi istnieć
 - `version` w `config.yaml` musi zgadzać się z tagiem obrazu
 
 ## Testy

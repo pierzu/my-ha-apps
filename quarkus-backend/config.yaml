@@ -1,5 +1,5 @@
 name: "Quarkus Backend"
-version: "0.0.6"
+version: "0.0.7"
 slug: "quarkus-backend"
 description: "Quarkus backend do testów lokalnych i uruchomienia w Home Assistant"
 arch:
@@ -17,3 +17,9 @@ image: "ghcr.io/pierzu/my-quarkus-backend"
 
 homeassistant_api: true
 hassio_role: homeassistant
+
+options:
+  gmail_app_password: null
+
+schema:
+  gmail_app_password: password

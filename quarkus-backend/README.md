@@ -79,7 +79,13 @@ Dopasowanie ignoruje wielkość liter.
   Zwraca ostatnie transakcje.
 
 - `POST /transactions`
-  Dodaje nową transakcję.
+  Dodaje nową transakcję i odświeża dashboard MQTT dla bieżącego okresu.
+
+- `PUT /transactions/{id}`
+  Aktualizuje istniejącą transakcję i odświeża dashboard MQTT dla bieżącego okresu.
+
+- `DELETE /transactions/{id}`
+  Usuwa transakcję i odświeża dashboard MQTT dla bieżącego okresu.
 
 - `GET /pending-transactions?status=PENDING&limit=20`
   Zwraca pendingi o wskazanym statusie.

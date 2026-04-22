@@ -1,13 +1,112 @@
-# Quarkus Backend
+# Budget Backend
 
-Ta appka uruchamia kontener Quarkus w Home Assistant.
+Backend budżetowy pod Home Assistant Green.
 
-## Wymagania
+Aplikacja:
+- zapisuje dane w SQLite w `/data/budget.db`
+- obsługuje ręczne dodawanie transakcji
+- obsługuje pendingi do zatwierdzania i odrzucania
+- importuje maile z IMAP
+- parsuje wybrane maile bankowe PKO
+- dopasowuje reguły autokategoryzacji
+- publikuje dashboard i pendingi do MQTT dla Home Assistant
 
-- obraz `ghcr.io/YOUR_GITHUB_LOGIN/my-quarkus-backend:0.0.9` musi istnieć
-- `version` w `config.yaml` musi zgadzać się z tagiem obrazu
+## Konfiguracja
 
-## Testy
+Najważniejsze ustawienia:
+- `budget.mqtt.enabled`
+- `budget.mqtt.host`
+- `budget.mqtt.port`
+- `budget.mqtt.username`
+- `budget.mqtt.password`
+- `budget.mail-import.enabled`
+- `budget.mail-import.schedule`
+- `budget.mail-import.imap.host`
+- `budget.mail-import.imap.port`
+- `budget.mail-import.imap.username`
+- `budget.mail-import.imap.folder`
+- env `BUDGET_MAIL_IMPORT_IMAP_PASSWORD`
 
-- Web UI prowadzi na `/ha/health`
-- endpoint `/ha/ping` sprawdza połączenie z Home Assistant Core API przez Supervisor proxy
+Hasło IMAP jest pobierane z env vara, nie z pliku properties.
+
+## MQTT i Home Assistant
+
+Aplikacja publikuje retained state do MQTT:
+- dashboard bieżącego okresu
+- listę pendingów
+- discovery dla encji Home Assistant
+
+Po starcie publikowany jest też świeży stan, żeby nadpisać stare retained payloady po reinstalacji albo wyczyszczeniu bazy.
+
+## Reguły autokategoryzacji
+
+Po wyliczeniu docelowego `description` z parsera maili aplikacja może dopasować regułę importu i:
+- zasugerować kategorię
+- albo automatycznie zatwierdzić transakcję
+
+Reguła zawiera:
+- `pattern`
+- `category_code`
+- `match_mode`
+- `action`
+- `priority`
+- `active`
+
+Obsługiwane `match_mode`:
+- `CONTAINS`
+- `EXACT`
+- `STARTS_WITH`
+- `ENDS_WITH`
+
+Obsługiwane `action`:
+- `SUGGEST`
+- `AUTO_CONFIRM`
+
+Dopasowanie ignoruje wielkość liter.
+
+## Resources
+
+- `GET /ha/health`
+  Prosty healthcheck backendu.
+
+- `GET /ha/ping`
+  Test połączenia z Home Assistant Supervisor API.
+
+- `GET /dashboard/current-period`
+  Zwraca dashboard bieżącego okresu budżetowego.
+
+- `GET /transactions?limit=20`
+  Zwraca ostatnie transakcje.
+
+- `POST /transactions`
+  Dodaje nową transakcję.
+
+- `GET /pending-transactions?status=PENDING&limit=20`
+  Zwraca pendingi o wskazanym statusie.
+
+- `POST /pending-transactions/import`
+  Tworzy pojedynczy pending z importu.
+
+- `PUT /pending-transactions/{id}`
+  Edytuje pending.
+
+- `POST /pending-transactions/{id}/confirm`
+  Zatwierdza pending i tworzy finalną transakcję.
+
+- `POST /pending-transactions/{id}/reject`
+  Odrzuca pending.
+
+- `POST /mail-import/run`
+  Ręcznie uruchamia jednorazowy import maili.
+
+- `GET /import-category-rules`
+  Lista reguł autokategoryzacji.
+
+- `POST /import-category-rules`
+  Dodaje nową regułę.
+
+- `PUT /import-category-rules/{id}`
+  Aktualizuje istniejącą regułę.
+
+- `DELETE /import-category-rules/{id}`
+  Usuwa regułę.
